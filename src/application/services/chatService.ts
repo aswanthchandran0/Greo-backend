@@ -39,7 +39,7 @@ import { ChatDto, MessageDto } from "../dto/chatDto";export class ChatService{
 
    }
 
-   public async AddMessage(chatId:string, senderId:string, text: string):Promise<void>{
+   public async AddMessage(chatId:string, senderId:string, text: string):Promise<MessageDto>{
     console.log('chat service',chatId,senderId,text)
     return await this.addMessage.execute(chatId, senderId, text);
    }

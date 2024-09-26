@@ -43,6 +43,19 @@ export class PostRepositoryImpl implements PostRepository{
             }
             },
            {
+            $lookup:{
+                from:"comment",
+                localField:'_id',
+                foreignField:"postId",
+                as:'comments'
+            }
+           },
+           {
+            $addFields:{
+                totalComments:{$size:'$comments'}
+            }
+           },
+           {
             $project:{
                 _id:1,
                 userId:1,
@@ -55,6 +68,7 @@ export class PostRepositoryImpl implements PostRepository{
                 createdAt:1,  
                 updatedAt:1,
                 totalLikes:1,
+                totalComments:1,
                 isLiked:1
             }
            }

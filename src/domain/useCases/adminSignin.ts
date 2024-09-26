@@ -7,6 +7,7 @@ export class SigninAdmin{
     constructor (private adminRepository:AdminRepository){}
     async execute(email:string,password:string):Promise<adminResponse>{
       const admin = await this.adminRepository.findByEmail(email)
+
         if(!admin){
             throw new Error('Admin not found')
         }

@@ -3,7 +3,7 @@ import { Admin } from "../../domain/entities/admin";
 import { AdminUserManagement } from "../../domain/useCases/adminUserManagement";
 import { User } from "../../domain/entities/user";
 import { adminResponse } from "../dto/adminDto";
-import { Schema } from "mongoose";
+import mongoose, { Schema } from "mongoose";
 export class AdminService{
     constructor(
         private signinAdmin:SigninAdmin,
@@ -36,8 +36,11 @@ export class AdminService{
         await this.adminUserManagement.updateUser(user)
     }
 
-    async suspendUser(user_id:Schema.Types.ObjectId):Promise<void>{
+    async suspendUser(user_id:mongoose.Types.ObjectId):Promise<void>{
         await this.adminUserManagement.suspendUser(user_id)
     }
-
+   
+    async unSuspendUser(user_id:mongoose.Types.ObjectId):Promise<void>{
+        await this.adminUserManagement.unsuSpendUser(user_id)
+    }   
 }

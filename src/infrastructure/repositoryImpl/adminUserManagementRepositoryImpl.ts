@@ -1,7 +1,7 @@
 import { AdminUserManagementRepository } from "../../domain/repositories/adminUserManagementRepository";
 import { User } from "../../domain/entities/user";
 import { UserModel } from "../database/mongo/models/userModel";
-import { Document } from "mongoose";
+import mongoose, { Document } from "mongoose";
 import { UserMapper } from "../mappers/userMapper";
 import { Schema } from "mongoose";
 
@@ -34,9 +34,12 @@ export class AdminUserManagementRepositoryImpl implements AdminUserManagementRep
          await UserModel.findByIdAndUpdate(user.id,UserMapper.fromUser(user)).exec()
      }
      
-     async suspendUser(user_id: Schema.Types.ObjectId): Promise<void> {
+     async suspendUser(user_id: mongoose.Types.ObjectId): Promise<void> {
          await UserModel.findByIdAndUpdate(user_id,{is_suspended:true}).exec()
      }
 
+    async unSuspendUser(user_id:mongoose.Types.ObjectId): Promise<void> {
+        await UserModel.findByIdAndUpdate(user_id,{is_suspended:false}).exec()
+    }
 
 }

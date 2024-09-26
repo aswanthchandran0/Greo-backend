@@ -57,12 +57,13 @@ export class ChatController {
   public async addMessage(req: Request, res: Response): Promise<Response> {
     try {
       const { chatId, senderId, text } = req.body;
-      await this.chatService.AddMessage(
+     const message =   await this.chatService.AddMessage(
        chatId,
      senderId,
         text
       );
-      return res.status(200).json({ message: "Message added successfully" });
+      console.log('latest message',message)
+      return res.status(200).json(message);
     } catch (error) {
       console.log('error',error)
       return res.status(500).json({ message: "Error adding message", error });

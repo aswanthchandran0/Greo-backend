@@ -1,6 +1,6 @@
 import { AdminUserManagementRepository } from "../repositories/adminUserManagementRepository";
 import { User } from "../entities/user";
-import { Schema } from "mongoose";
+import mongoose, { Schema } from "mongoose";
 
 export class AdminUserManagement{
     constructor(private adminUserManagementRepository:AdminUserManagementRepository){}
@@ -15,7 +15,11 @@ export class AdminUserManagement{
     await  this.adminUserManagementRepository.updateUser(user)
     }
 
-    async suspendUser(user_id:Schema.Types.ObjectId):Promise<void>{
+    async suspendUser(user_id:mongoose.Types.ObjectId):Promise<void>{
         await this.adminUserManagementRepository.suspendUser(user_id)
+    }
+
+    async unsuSpendUser(user_id:mongoose.Types.ObjectId):Promise<void>{
+        await this.adminUserManagementRepository.unSuspendUser(user_id)
     }
 }

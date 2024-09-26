@@ -14,7 +14,7 @@ import { EmailService } from "../../application/services/emailService";
 import { VerifyOtp } from "../../domain/useCases/verifiOtp";
 import { SignUpWithGoogle } from "../../domain/useCases/signUpWithGoogle";
 import { SignInWithGoogle } from "../../domain/useCases/signInWithGoogle";
-import { authenticateToken } from "../../infrastructure/frameworksDrivers/express/middleware/authMiddleware";
+import { authenticateToken } from "../../infrastructure/frameworksDrivers/express/middleware/userMiddleware/authMiddleware";
 import { uploadMiddleware, uploadSingleImageMiddleware } from "../../infrastructure/frameworksDrivers/express/middleware/fileUploadMiddleware";
 import { CloudinaryService } from "../../application/services/cloudnaryService";
 import { UploadPost } from "../../domain/useCases/uploadPost";
@@ -30,6 +30,7 @@ import { UserGraphRepositoryImpl } from "../../infrastructure/repositoryImpl/use
 import { UserGraphService } from "../../application/services/userGraphService";
 import {getPostsWithUserByUserName} from "../../domain/useCases/getPostsWithUserByUsername"
 import { GetUserByUserId } from "../../domain/useCases/getUserByUserId";
+import { auth } from "neo4j-driver";
 
 const router = Router() 
 const  userRepository = new UserRepositoryImpl()
@@ -72,17 +73,16 @@ router.post('/refresh_token',userController.refreshToken.bind(userController))
 router.post('/post_upload',uploadMiddleware,userController.createPost.bind(userController))
 router.get('/get_posts',authenticateToken, userController.GetPosts.bind(userController))
 router.post('/like_post',authenticateToken,userController.LikeUnLikePost.bind(userController))
-router.get('/get_comments/:postId',userController.GetComments.bind(userController))
-router.post('/sent_comment',authenticateToken,userController.SentComment.bind(userController))
-      
+router.get('/get_comments/:postId',authenticateToken,userController.GetComments.bind(userController))
+router.post('/sent_comment',authenticateToken,userController.SentComment.bind(userController))   
 router.post('/follow',authenticateToken, userController.followUser.bind(userController));
 router.post('/unfollow',authenticateToken, userController.unfollowUser.bind(userController));
 router.get('/followers',authenticateToken, userController.getFollowers.bind(userController));
 router.get('/following',authenticateToken, userController.getFollowing.bind(userController));
-router.get('/get_user_posts/:username',userController.getPostsByUserName.bind(userController))
+router.get('/get_user_posts/:username', authenticateToken,userController.getPostsByUserName.bind(userController))
 router.patch('/profile',uploadSingleImageMiddleware,userController.updateUserProfie.bind(userController))
 router.get('/userProfile/:username',authenticateToken,userController.getUserProfileWithUser.bind(userController))
-router.get('/get_user_by_id/:userId',userController.getUserByUserId.bind(userController))
+router.get('/get_user_by_id/:userId',authenticateToken,userController.getUserByUserId.bind(userController))
 export default router;  
   
   

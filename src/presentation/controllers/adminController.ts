@@ -1,7 +1,7 @@
 import { Request,Response } from "express";
 import { AdminService } from "../../application/services/adminService";
 import { User } from "../../domain/entities/user";
-import { Types } from "mongoose";
+import mongoose, { mongo, Types } from "mongoose";
 import { Schema } from "mongoose";
 export class AdminController{
     constructor(private adminservice:AdminService){}
@@ -63,13 +63,26 @@ export class AdminController{
 
     async suspendUser(req:Request,res:Response):Promise<void>{
         try{ 
-            console.log('request was reached in suspend user')
-            const user_id = req.body.userId
-            const userObjectId = new Schema.ObjectId(user_id)
+            const userId = req.body.userId
+            console.log('user id',userId)
+            const userObjectId = new mongoose.Types.ObjectId(userId)
             await this.adminservice.suspendUser(userObjectId)
             res.status(200).json({message:'User suspended sucessfully'})
         }catch(err){
+            console.log(err)
             res.status(500).json({message:(err as Error).message})
         }
     }
+
+    async unSuspendUser(req:Request,res:Response):Promise<void>{
+        try{    
+            const userId = req.body.userId
+            const userObjectId = new mongoose.Types.ObjectId(userId)
+            await this.adminservice.unSuspendUser(userObjectId)
+            res.status(200).json({message:'User unsuspended sucessfully'})
+        }catch(err){
+            console.log(err)
+            res.status(400).json({message:(err as Error).message})
+        }
+        }
 }
