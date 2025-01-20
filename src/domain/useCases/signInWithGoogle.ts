@@ -23,16 +23,7 @@ export class SignInWithGoogle {
     const refreshToken = tokenService.generateRefreshToken(user.id);
 
     return {
-      user: {
-        id: user.id,
-        profileImage: user.profileImage,
-        name: user.name,
-        user_name: user.user_name,
-        email: user.email,
-        user_bio: user.user_bio,
-        lastseen_online: user.lastseen_online,
-        is_suspended: user.is_suspended
-      },
+      user:user,
       tokens: {
         accessToken,
         refreshToken

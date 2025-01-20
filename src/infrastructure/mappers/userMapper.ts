@@ -6,14 +6,17 @@ export class UserMapper{
     static toUser(doc:Document<any,any,Iuser>&Iuser):User{
         return new User(
             doc._id.toString(),
+            doc.name,
             doc.profileImage,
             doc.user_name,
-            doc.name,
             doc.email,
             doc.user_bio,
             doc.lastseen_online,
             doc.password,
-            doc.is_suspended || false
+            doc.user_gender, 
+            doc.private_account,
+            doc.is_suspended,
+            doc.is_verified
         )
     }
 

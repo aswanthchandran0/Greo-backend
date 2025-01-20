@@ -1,5 +1,5 @@
 import { LikeRepository } from "../../domain/repositories/likeRepository";
-import { Schema } from "mongoose";
+import mongoose, { Schema } from "mongoose";
 export class UnlikePost {
     private likeRepository: LikeRepository;
 
@@ -7,7 +7,7 @@ export class UnlikePost {
         this.likeRepository = likeRepository;
     }
 
-    async execute(userId:Schema.Types.ObjectId, postIds: Schema.Types.ObjectId[]): Promise<void> {
+    async execute(userId:mongoose.Types.ObjectId, postIds: mongoose.Types.ObjectId[]): Promise<void> {
         await this.likeRepository.unlikePosts(userId, postIds);
     }
 }

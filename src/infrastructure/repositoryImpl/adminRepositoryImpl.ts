@@ -1,6 +1,10 @@
+import mongoose from "mongoose";
+import { UserDetails } from "../../application/dto/userDto";
 import { Admin } from "../../domain/entities/admin";
 import { AdminRepository } from "../../domain/repositories/adminRepository";
 import { AdminModel } from "../database/mongo/models/adminModel";
+import { UserModel } from "../database/mongo/models/userModel";
+import { PostModel } from "../database/mongo/models/postModel";
 
 export class AdminRepositoryImpl implements AdminRepository{
      async findByEmail(email: string): Promise<Admin | null> {
@@ -12,4 +16,6 @@ export class AdminRepositoryImpl implements AdminRepository{
      const adminModel = new AdminModel(admin)
      await adminModel.save()
      }
+
+   
 }

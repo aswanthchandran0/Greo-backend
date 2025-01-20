@@ -2,7 +2,7 @@ import { userRepository } from "../../domain/repositories/userRepository";
 
 export class RandomNameGenerator{
    constructor (private userRepository:userRepository){}
-  async uniqueNameGenerator(baseName:string, maxRetries: number = 1000):Promise<String>{
+  async uniqueNameGenerator(baseName:string, maxRetries: number = 1000):Promise<string>{
     let uniqueName = baseName;
     let isAvailable = false;
     let retryCount = 0;

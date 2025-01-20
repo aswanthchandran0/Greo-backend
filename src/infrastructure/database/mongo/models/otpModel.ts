@@ -2,7 +2,7 @@ import mongoose,{Document,Schema} from "mongoose";
 
 
 interface IOtp extends   Document{
-    user_id:Schema.Types.ObjectId,
+    user_id:mongoose.Types.ObjectId,
     otpCode:string,
     expiresAt:Date
 }

@@ -8,7 +8,6 @@ class GoogleOAuthService {
     public async verifyGoogleToken(token:string):Promise<any>{
         try{
             const response = await axios.get(`${this.userInfoUrl}?access_token=${token}`)
-            console.log(response.data)
             return response.data
         }catch(err){
             throw new Error('Invalid or Expired token')

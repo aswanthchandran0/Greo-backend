@@ -1,8 +1,8 @@
-import { Schema } from "mongoose";
+import mongoose from "mongoose";
 
 export class OTP{
     constructor(
-        public userId:Schema.Types.ObjectId,
+        public user_id:mongoose.Types.ObjectId,
         public otpCode:string,
         public expiresAt:Date
     ){}

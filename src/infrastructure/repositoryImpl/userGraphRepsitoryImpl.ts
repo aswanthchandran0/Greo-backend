@@ -2,7 +2,7 @@ import { query } from "express";
 import { IUserGraphRepository } from "../../domain/repositories/userGraphRepository";
 import { getSession } from "../database/neo4j/neo4jConfig";
 import { User } from "../../domain/entities/user";
-import { graphUser } from "../../application/dto/userDto";
+import { graphUser, TopFollowerUser } from "../../application/dto/userDto";
 export class UserGraphRepositoryImpl implements IUserGraphRepository{
     async createUserNode(userId:string,userName:string):Promise<void>{
       const session = getSession()
@@ -17,8 +17,6 @@ export class UserGraphRepositoryImpl implements IUserGraphRepository{
     }
 
     async followUser(followerId: string, followeeId: string): Promise<void> {
-      console.log('followerId in grap impl',followerId)
-      console.log('followeeId in grap impl',followeeId)
       const session = getSession()
       const query =  `
       MATCH (f:User {id: $followerId}), (t:User {id: $followeeId})
@@ -44,34 +42,32 @@ export class UserGraphRepositoryImpl implements IUserGraphRepository{
           await session.close()
         }
     }
-    async getFollowers(userId: string): Promise<graphUser[]> {
+    async getFollowers(username: string): Promise<graphUser[]> {
       const session = getSession();
   const query = `
-    MATCH (u:User {id: $userId})<-[:FOLLOWS]-(f:User)
-    RETURN f.id AS id, f.name AS name
+    MATCH (u:User {name: $username})<-[:FOLLOWS]-(f:User)
+    RETURN f.id AS id
   `;
   try {
-    const result = await session.run(query, { userId });
+    const result = await session.run(query, { username });
     return result.records.map(record => ({
       id: record.get('id'),
-      name: record.get('name')
     }));
   } finally {
     await session.close();
   }
     }
   
-    async getFollowing(userId: string): Promise<graphUser[]> {
+    async getFollowing(username: string): Promise<graphUser[]> {
       const session = getSession();
       const query = `
-        MATCH (u:User {id: $userId})-[:FOLLOWS]->(f:User)
-        RETURN f.id AS id, f.name AS name
+        MATCH (u:User {name: $username})-[:FOLLOWS]->(f:User)
+        RETURN f.id AS id
       `;
       try {
-        const result = await session.run(query, { userId });
+        const result = await session.run(query, { username });
         return result.records.map(record => ({
           id: record.get('id'),
-          name: record.get('name')
         }));
       } finally {
         await session.close();
@@ -105,7 +101,7 @@ export class UserGraphRepositoryImpl implements IUserGraphRepository{
        const record = result.records[0]
        return record.get('FollowingCount').toInt()
       }finally{
-        session.close()
+       await session.close()
       }
     }
 
@@ -120,7 +116,57 @@ export class UserGraphRepositoryImpl implements IUserGraphRepository{
        const record = result.records[0]
        return record.get('isFollowing')
         }finally{
-          session.close()
+       await  session.close()
         }
     }
+
+    async updateUserName(userId:string,userName:string):Promise<void>{
+      const session = getSession()
+      const query = `
+      MATCH (u:User {id:$userId}) SET u.name = $userName
+      `
+      try{
+        await session.run(query,{userId,userName})
+      }finally{
+       await session.close()
+      }
+    }
+
+    async getFollowingIds(userId:string):Promise<string[]>{
+      const session = getSession()
+      const query = `
+      MATCH (u:User {id:$userId})-[:FOLLOWS]->(f:User)
+      RETURN f.id as FollowingId
+      `
+      try{
+       const result = await session.run(query,{userId})
+       return result.records.map(record => record.get('FollowingId'))
+      }finally{
+      await session.close()
+      }
+    }
+
+
+    async getTop10UsersByFollowers(): Promise<TopFollowerUser[]> {
+      const session = getSession();
+      const query = `
+        MATCH (u:User)<-[:FOLLOWS]-(f:User)
+        WITH u, COUNT(f) AS followersCount
+        ORDER BY followersCount DESC
+        LIMIT 10
+        RETURN u.id AS id, u.name AS name, followersCount
+      `;
+      try {
+        const result = await session.run(query);
+        return result.records.map(record => ({
+          id: record.get('id'),
+          name: record.get('name'),
+          followersCount: record.get('followersCount').toInt(),
+        }));
+      } finally {
+        await session.close();
+      }
+    }
+    
+    
 }

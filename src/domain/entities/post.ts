@@ -1,4 +1,4 @@
-import { Schema } from "mongoose"
+import mongoose, { Schema } from "mongoose"
 
 
 export type MediaType = 'post'|'roll'
@@ -14,3 +14,4 @@ export class Post{
         public updatedAt:Date
     ){}
 }
+

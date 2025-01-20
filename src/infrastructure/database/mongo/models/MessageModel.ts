@@ -1,7 +1,7 @@
 import { timeStamp } from "console";
 import mongoose, { Schema, Document, Model } from "mongoose";
 
-interface IMessage extends Document {
+export interface IMessage extends Document {
   chatId: mongoose.Types.ObjectId;
   senderId: mongoose.Types.ObjectId;
   text: string;

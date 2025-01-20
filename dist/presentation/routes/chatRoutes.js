@@ -1,0 +1,30 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const chatController_1 = require("../controllers/chatController");
+const chatService_1 = require("../../application/services/chatService");
+const createChat_1 = require("../../domain/useCases/createChat");
+const findChat_1 = require("../../domain/useCases/findChat");
+const userChats_1 = require("../../domain/useCases/userChats");
+const addMessage_1 = require("../../domain/useCases/addMessage");
+const getMessage_1 = require("../../domain/useCases/getMessage");
+const chatRepositoryImpl_1 = require("../../infrastructure/repositoryImpl/chatRepositoryImpl");
+const messageRepositoryImpl_1 = require("../../infrastructure/repositoryImpl/messageRepositoryImpl");
+// Create necessary instances
+const chatRepository = new chatRepositoryImpl_1.ChatRepositoryImpl();
+const messageRepository = new messageRepositoryImpl_1.MessagaeRepositoryImpl();
+const createChatUseCase = new createChat_1.CreateChat(chatRepository);
+const findChatUseCase = new findChat_1.FindChat(chatRepository);
+const userChatsUseCase = new userChats_1.UserChats(chatRepository);
+const addMessageUseCase = new addMessage_1.AddMessage(messageRepository);
+const getMessageUseCase = new getMessage_1.GetMessage(messageRepository);
+const chatService = new chatService_1.ChatService(createChatUseCase, findChatUseCase, userChatsUseCase, addMessageUseCase, getMessageUseCase);
+const chatController = new chatController_1.ChatController(chatService);
+// Define routes
+const router = (0, express_1.Router)();
+router.post('/', chatController.createChat.bind(chatController));
+router.get('/:userId', chatController.getUserChats.bind(chatController));
+router.get('/find/:senderId/:receiverId', chatController.findChat.bind(chatController));
+router.get('/m/:chatId', chatController.getMessage.bind(chatController));
+router.post('/m', chatController.addMessage.bind(chatController));
+exports.default = router;

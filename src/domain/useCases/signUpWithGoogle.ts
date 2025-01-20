@@ -1,13 +1,12 @@
 
-import { User, UserProfile } from "../entities/user";
+import { User} from "../entities/user";
 import { userRepository } from "../repositories/userRepository";
-import { UserProfileRepository } from "../repositories/userProfileRepository";
 import GoogleOAuthService from "../../application/services/googleOAuthService";
 import tokenService from "../../application/services/tokenService";
 import { GoogleSignUpResponse } from "../../application/dto/userDto";
 import { RandomNameGenerator } from "../../application/services/randomNameGenerator";
 import bcrypt from 'bcrypt'
-import { ClientSession, Schema } from "mongoose";
+import mongoose, { ClientSession} from "mongoose";
 
 export class SignUpWithGoogle {
   private googleOAuthService: GoogleOAuthService;
@@ -15,7 +14,6 @@ export class SignUpWithGoogle {
   private saltRounds = 10
     constructor(
         private userRepository:userRepository,
-        private userProfileRepository:UserProfileRepository,
     ){
       this.googleOAuthService = new GoogleOAuthService()
       this.randomNumberGenerator = new RandomNameGenerator(userRepository)
@@ -30,7 +28,6 @@ export class SignUpWithGoogle {
           const name = decodedtoken.name
           let user_name = await this.randomNumberGenerator.uniqueNameGenerator(name)
           const profileImage = decodedtoken.picture
-
           const password = decodedtoken.name +decodedtoken.sub
           const hashedPassword = await bcrypt.hash(password,this.saltRounds)
           let user = await this.userRepository.findByEmail(email,session)
@@ -38,19 +35,21 @@ export class SignUpWithGoogle {
           if(user){
              throw new Error('user already exist')
           }
-              const ObjectId = Schema.Types.ObjectId;
-              const userId = new ObjectId('')
+              const ObjectId = mongoose.Types.ObjectId;
+              const userId = new ObjectId()
             user = new User(
                 userId,
-                profileImage,
                 name,
+                profileImage,
                 user_name.toString(),
                 email,
                 '',
                 'Everyone',
                 hashedPassword,
+                'prefer not to say',
                 false,
-                publicKey
+                false,
+                true,
             )
           console.log('user in google sign up',user)
             user = await this.userRepository.save(user,session)

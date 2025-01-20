@@ -7,7 +7,7 @@ interface Ichat extends Document{
 
 const ChatSchma = new Schema(
     {
-   members:{type:Array},  
+   members: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],  
 },{
     timestamps:true
 }

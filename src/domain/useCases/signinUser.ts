@@ -9,21 +9,14 @@ export class SigninUser {
     const user = await this.userRepository.findByEmail(email)
 
     if (!user) throw new Error('Invalid email or password')
-
     if (user.is_suspended) throw new Error('User suspended')
-
+      if(!user.is_verified) throw new Error('User not verified')
     const isPasswordValid = await bcrypt.compare(password, user.password)
     if (!isPasswordValid) throw new Error('Invalid email or password')
-
-
     const accessToken = tokenService.generateAccessToken(user.id);
     const refreshToken = tokenService.generateRefreshToken(user.id);
     return {
-      user: {
-        id: user.id,
-        user_name: user.user_name,
-        email: user.email
-      },
+      user,
       tokens: {
         accessToken,
         refreshToken

@@ -1,6 +1,9 @@
 import { Like } from "../entities/like";
-import { Schema } from "mongoose";
+import mongoose from "mongoose";
+import { User } from "../entities/user";
+import { Iuser } from "../../infrastructure/database/mongo/models/userModel";
 export interface LikeRepository{
-    likePosts(userId: Schema.Types.ObjectId, postIds: Schema.Types.ObjectId[]): Promise<void>;
-    unlikePosts(userId: Schema.Types.ObjectId, postIds: Schema.Types.ObjectId[]): Promise<void>;
+    likePosts(userId: mongoose.Types.ObjectId, postIds: mongoose.Types.ObjectId[]): Promise<void>;
+    unlikePosts(userId: mongoose.Types.ObjectId, postIds: mongoose.Types.ObjectId[]): Promise<void>;
+    getLikedUsers(postId:mongoose.Types.ObjectId):Promise<Iuser[]| null>
 }

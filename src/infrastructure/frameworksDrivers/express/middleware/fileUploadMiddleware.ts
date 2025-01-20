@@ -6,7 +6,7 @@ import fs, { mkdir } from 'fs'
 
 const storage = multer.diskStorage({
   destination:(req,file,cb)=>{
-    console.log(file)
+
     const uploadDistination = path.join(__dirname,'../../../../uploads/posts')
     
      if(!fs.existsSync(uploadDistination)){

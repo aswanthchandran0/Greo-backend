@@ -13,10 +13,10 @@ export class ChatController {
   // Create a new chat
   public async createChat(req: Request, res: Response): Promise<Response> {
     try {
-      const  members  = []
-      members.push(req.body.senderId,req.body.receiverId)
-      
+      const members = [req.body.senderId, req.body.receiverId];
+      console.log('members',members)
       const chat = await this.chatService.CreateChat(members);
+      console.log('after chat response from service',chat)
       return res.status(201).json(chat);
     } catch (error) {
       return res.status(500).json({ message: "Error creating chat", error });
@@ -27,6 +27,7 @@ export class ChatController {
   public async getUserChats(req: Request, res: Response): Promise<Response> {
     try {
       const userId = req.params.userId
+      
       const chats = await this.chatService.UserChats(userId);
       return res.status(200).json(chats);
     } catch (error) {
@@ -73,10 +74,13 @@ export class ChatController {
   public async getMessage(req: Request, res: Response): Promise<Response> {
     try {
       const chatId = req.params.chatId;
+      console.log('chat id ',chatId)
       const messages = await this.chatService.GetMessage(chatId);
+      console.log('message in mesage',messages)
       return res.status(200).json(messages);
     } catch (error) {
       return res.status(500).json({ message: "Error fetching messages", error });
     }
   }
 }
+      
