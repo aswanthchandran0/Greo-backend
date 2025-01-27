@@ -14,6 +14,7 @@ export class PostComment{
       )
       const comment = new Comment(postId,[commentContent],new Date())
       const savedComment =  await this.commentRepository.save(comment)
+      
      return savedComment
     }
 }

@@ -6,6 +6,7 @@ import { config } from './config/config'
 import morgan from 'morgan'
 import bodyParser from 'body-parser'
 import cors from 'cors'
+import http from 'http'
 // import { ChatRepositoryImpl } from './infrastructure/repositoryImpl/chatRepositoryImpl'
 // import { ChatService } from './application/services/chatService'
 // import { SendMessage } from './domain/useCases/sendMessage'
@@ -14,19 +15,32 @@ import  chatRoutes  from './presentation/routes/chatRoutes'
 
 // Initialize Express app
 const app = express()
-   
+const port =process.env.PORT
+const url =process.env.URL
+// socket server initialzation
+const server = http.createServer(app)
+
+
+
+// for handling multiple origins
+const allowedOrigins: string[] = []
+if(config.CLIENT_SIDE_URL)allowedOrigins.push(config.CLIENT_SIDE_URL)
+if(config.PRODUCTION_CLIENT_SIDE_URL)allowedOrigins.push(config.PRODUCTION_CLIENT_SIDE_URL)
+if(config.PRODUCTION_CLIENT_SIDE_WWW_URL)allowedOrigins.push(config.PRODUCTION_CLIENT_SIDE_WWW_URL)
 
 // CORS Options
 const corsOptions = {
-    origin: config.CLIENT_SIDE_URL,
+    origin:   allowedOrigins.length > 0 ? allowedOrigins : [],
     methods: 'GET,PATCH,POST,PUT,DELETE,OPTIONS',
     allowedHeaders:['content-Type','Authorization','Origin','X-Requested-With','Accept'],
+    credentials: true, 
+    optionsSuccessStatus: 204
 
 }
 //middlewares
+app.use(cors(corsOptions))
 app.use(bodyParser.json({ limit: "50mb" }));
 app.use(bodyParser.urlencoded({ limit: "50mb", extended: true }));
-app.use(cors(corsOptions))
 app.use(morgan('dev'))
 app.use(express.json())
 app.use(express.urlencoded({extended:true}))  
@@ -60,8 +74,7 @@ app.options('*', cors(corsOptions))
 
 
 // Starting the server
-const PORT = config.PORT || 3000
-const server = app.listen(PORT,()=>{
-    console.log('server is running')
-})
 
+server.listen(port, () => {
+    console.log(`Server is running at ${url}:${port}`);
+  });

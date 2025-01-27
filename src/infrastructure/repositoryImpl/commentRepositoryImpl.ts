@@ -9,6 +9,7 @@ import { PostModel } from "../database/mongo/models/postModel";
 export class commentRepositoryImpl implements CommentRepository{
  
   async save(comment: Comment): Promise<CommentDto | null> {
+    console.log('comment in saved repo',comment)
     try {
       const existingComments   = await CommentModel.findOne({ postId: comment.postId }).exec();
       const user = await UserModel.findById(comment.comments[0].userId).exec();
