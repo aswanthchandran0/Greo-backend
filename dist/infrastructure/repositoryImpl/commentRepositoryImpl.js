@@ -15,6 +15,7 @@ const userModel_1 = require("../database/mongo/models/userModel");
 class commentRepositoryImpl {
     save(comment) {
         return __awaiter(this, void 0, void 0, function* () {
+            console.log('comment in saved repo', comment);
             try {
                 const existingComments = yield commentModel_1.CommentModel.findOne({ postId: comment.postId }).exec();
                 const user = yield userModel_1.UserModel.findById(comment.comments[0].userId).exec();

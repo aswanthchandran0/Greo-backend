@@ -11,6 +11,7 @@ const config_1 = require("./config/config");
 const morgan_1 = __importDefault(require("morgan"));
 const body_parser_1 = __importDefault(require("body-parser"));
 const cors_1 = __importDefault(require("cors"));
+const http_1 = __importDefault(require("http"));
 // import { ChatRepositoryImpl } from './infrastructure/repositoryImpl/chatRepositoryImpl'
 // import { ChatService } from './application/services/chatService'
 // import { SendMessage } from './domain/useCases/sendMessage'
@@ -18,16 +19,30 @@ const cors_1 = __importDefault(require("cors"));
 const chatRoutes_1 = __importDefault(require("./presentation/routes/chatRoutes"));
 // Initialize Express app
 const app = (0, express_1.default)();
+const port = process.env.PORT;
+const url = process.env.URL;
+// socket server initialzation
+const server = http_1.default.createServer(app);
+// for handling multiple origins
+const allowedOrigins = [];
+if (config_1.config.CLIENT_SIDE_URL)
+    allowedOrigins.push(config_1.config.CLIENT_SIDE_URL);
+if (config_1.config.PRODUCTION_CLIENT_SIDE_URL)
+    allowedOrigins.push(config_1.config.PRODUCTION_CLIENT_SIDE_URL);
+if (config_1.config.PRODUCTION_CLIENT_SIDE_WWW_URL)
+    allowedOrigins.push(config_1.config.PRODUCTION_CLIENT_SIDE_WWW_URL);
 // CORS Options
 const corsOptions = {
-    origin: config_1.config.CLIENT_SIDE_URL,
+    origin: allowedOrigins.length > 0 ? allowedOrigins : [],
     methods: 'GET,PATCH,POST,PUT,DELETE,OPTIONS',
     allowedHeaders: ['content-Type', 'Authorization', 'Origin', 'X-Requested-With', 'Accept'],
+    credentials: true,
+    optionsSuccessStatus: 204
 };
 //middlewares
+app.use((0, cors_1.default)(corsOptions));
 app.use(body_parser_1.default.json({ limit: "50mb" }));
 app.use(body_parser_1.default.urlencoded({ limit: "50mb", extended: true }));
-app.use((0, cors_1.default)(corsOptions));
 app.use((0, morgan_1.default)('dev'));
 app.use(express_1.default.json());
 app.use(express_1.default.urlencoded({ extended: true }));
@@ -49,7 +64,6 @@ app.use('/api/chat', chatRoutes_1.default);
 app.options('*', (0, cors_1.default)(corsOptions));
 // Error handling middleware
 // Starting the server
-const PORT = config_1.config.PORT || 3000;
-const server = app.listen(PORT, () => {
-    console.log('server is running');
+server.listen(port, () => {
+    console.log(`Server is running at ${url}:${port}`);
 });
