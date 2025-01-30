@@ -289,41 +289,47 @@ export class PostRepositoryImpl implements PostRepository {
     }
   }
 
-  // report post
+  
   async reportPost(
     postId: mongoose.Types.ObjectId,
     userId: mongoose.Types.ObjectId,
     reason: ReasonType
   ): Promise<void> {
     try {
-      // Check if the user has already reported this post
-      const existingReport = await postReportModel.findOne({
-        postId,
-        "users.id": userId,
-      });
-
+      // Check if there's any existing report for the post
+      let existingReport = await postReportModel.findOne({ postId });
+  
       if (existingReport) {
-        // If the user has already reported, update the report by adding a new reason
-        existingReport.users.push({ id: userId, reason });
+        // Check if the user has already reported this post
+        const userReportIndex = existingReport.users.findIndex(user =>
+          user.id.equals(userId)
+        );
+  
+        if (userReportIndex !== -1) {
+          // Update the existing user's reason
+          existingReport.users[userReportIndex].reason = reason;
+          console.log("Updated report for user:", userId, "on post:", postId);
+        } else {
+          // Add the user to the existing report
+          existingReport.users.push({ id: userId, reason });
+          console.log("Added user report to existing post report:", postId);
+        }
         await existingReport.save();
-        console.log("Updated report for user:", userId, "on post:", postId);
       } else {
-        // If no report exists for this user, create a new report
+        // Create a new report for the post with the user's reason
         const newReport = new postReportModel({
           postId,
           users: [{ id: userId, reason }],
           createdAt: new Date(),
         });
-
         await newReport.save();
-        console.log("Created new report for user:", userId, "on post:", postId);
+        console.log("Created new report for post:", postId);
       }
     } catch (error) {
       console.error("Error reporting post:", error);
       throw new Error("Failed to report post.");
     }
   }
-
   async getReportedPosts(): Promise<any> {
     try {
       const reportedPosts = await postReportModel.aggregate([
