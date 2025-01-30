@@ -3,7 +3,8 @@ import { User } from "../../domain/entities/user";
 import { Iuser, UserModel } from "../database/mongo/models/userModel";
 import { session } from "neo4j-driver";
 import mongoose, { ClientSession, Mongoose } from "mongoose";
-import { IFollowers } from "../../application/dto/userDto";
+import { IFollowers, TopFollowerUserDto } from "../../application/dto/userDto";
+import { getSession } from "../database/neo4j/neo4jConfig";
 
 export class UserRepositoryImpl implements userRepository {
   async save(user: User, session?: ClientSession): Promise<User> {
@@ -177,4 +178,80 @@ async getArrayOfUsers(followers: IFollowers[]): Promise<User[] | null> {
         const users = await UserModel.find({_id:{$in:userIds}})
       return users 
   }
+
+
+
+  async getUsersWithPagination(
+    userId: mongoose.Types.ObjectId,
+    page: number,
+    limit: number = 8
+  ): Promise<{ users: TopFollowerUserDto[]; totalUsers: number }> {
+    try {
+      const totalUsers = await UserModel.countDocuments();
+  
+      // Fetch users with pagination
+      const users = await UserModel.find()
+        .skip((page - 1) * limit)
+        .limit(limit)
+        .select("-password")
+        .exec();
+  
+      // Create a session for the Neo4j queries
+      const session = getSession(); // Assuming getSession is defined elsewhere
+  
+      // For each user, fetch the followers count and check if the current user is following them
+      const userDtos: TopFollowerUserDto[] = [];
+      for (const user of users) {
+        // Query to get the followers count
+        const followersQuery = `
+          MATCH (u:User {id: $userId})<-[:FOLLOWS]-(f:User)
+          RETURN COUNT(f) AS FollowersCount
+        `;
+        const followersResult = await session.run(followersQuery, { userId: user._id.toString() });
+        const followersCount = followersResult.records.length > 0 ? followersResult.records[0].get('FollowersCount').toInt() : 0;
+  
+        // Query to check if the current user is following this user
+        const isFollowingQuery = `
+          MATCH (u:User {id: $currentUserId})-[:FOLLOWS]->(f:User {id: $targetUserId})
+          RETURN COUNT(u) > 0 AS IsFollowing
+        `;
+        const isFollowingResult = await session.run(isFollowingQuery, {
+          currentUserId: userId.toString(),
+          targetUserId: user._id.toString(),
+        });
+        const isFollowing = isFollowingResult.records.length > 0 ? isFollowingResult.records[0].get('IsFollowing') : false;
+  
+        // Only include users that the current user is NOT following
+        if (!isFollowing) {
+          const userDto: TopFollowerUserDto = {
+            _id: user._id,
+            name: user.name,
+            profileImage: user.profileImage,
+            user_name: user.user_name,
+            email: user.email,
+            user_bio: user.user_bio,
+            lastseen_online: user.lastseen_online,
+            user_gender: user.user_gender,
+            private_account: user.private_account,
+            is_suspended: user.is_suspended,
+            is_verified: user.is_verified,
+            publicKey: user.publicKey,
+            createdAt: user.createdAt,
+            followersCount: followersCount,
+          };
+  
+          userDtos.push(userDto);
+        }
+      }
+  
+      await session.close(); // Close session after processing all users
+  
+      // Return only the users that the current user is not following
+      return { users: userDtos, totalUsers: totalUsers };
+    } catch (error) {
+      console.error("Error fetching paginated users with followers count:", error);
+      throw new Error("Something went wrong");
+    }
+  }
+
 }

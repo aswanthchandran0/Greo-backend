@@ -114,9 +114,10 @@ export class AdminController {
   async getStackOfUser(req:Request,res:Response):Promise<void>{
     try{
        const {userIds} = req.body
-
+          console.log("user ids",userIds)
        const ObjectUserId = userIds.map((userId:string) => new mongoose.Types.ObjectId(userId))
        const response = await this.adminservice.FindStackOfUser(ObjectUserId)
+       console.log("response",response)
        res.status(200).json(response);
     }catch (err) {
       console.log(err);

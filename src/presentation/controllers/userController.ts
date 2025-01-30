@@ -753,6 +753,23 @@ async deleteRoll(req:Request,res:Response):Promise<void>{
       .json({ message: "An error occurred while deleting the item" });
   }
 }
+
+
+async getUserProfiles(req:Request,res:Response):Promise<void>{
+  try{
+    const userId = (req as any).user.userId
+    const {page,limit} = req.params
+    const objectUserId = new mongoose.Types.ObjectId(userId)
+   
+    const response = await this.userService.GetUserProfiles(objectUserId,Number(page),Number(limit))
+    res.status(200).json(response)
+  }catch (err) {
+    console.log(err);
+    res
+      .status(500)
+      .json({ message: "An error occurred while deleting the item" });
+  }
+}
   //    async getProfile(req:Request,res:Response):Promise<void>{
   //       try{
 

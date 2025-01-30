@@ -65,6 +65,7 @@ import { DeleteNotification } from "../../domain/useCases/deleteNotification";
 import { GetUserNotification } from "../../domain/useCases/getUserNotification";
 import { NotificationUpdate } from "../../domain/useCases/notificationUpdate";
 import { DeleteRoll } from "../../domain/useCases/deleteRoll";
+import { GetUserProfiles } from "../../domain/useCases/getUserProfiles";
 // import { OtpRepositoryImpl } from "../../infrastructure/repositoryImpl/otpRepositoryImpl";
 // import { SendOtp } from "../../domain/useCases/sentOtp";
 // import { EmailService } from "../../application/services/emailService";
@@ -150,6 +151,7 @@ const deleteNotification = new DeleteNotification(notificatonRepository);
 const getUserNotification = new GetUserNotification(notificatonRepository);
 const notificationUpdate = new NotificationUpdate(notificatonRepository);
 const deleteRoll = new DeleteRoll(rollRepository);
+const getUserProfiles = new GetUserProfiles(userRepository);
 
 const userService = new UserService(
   userRepository,
@@ -195,7 +197,8 @@ const userService = new UserService(
   deleteNotification,
   getUserNotification,
   notificationUpdate,
-  deleteRoll
+  deleteRoll,
+  getUserProfiles
 );
 const userController = new UserController(userService, userGraphService);
 router.post("/user_signup", userController.signup.bind(userController));
@@ -401,6 +404,11 @@ router.patch(
   userController.updateNotification.bind(userController)
 );
 
+router.get(
+  "/profiles/:page/:limit",
+  authenticateToken,
+  userController.getUserProfiles.bind(userController)
+);
 // const userService = new UserService(signupUser,signinUser, getUserProfile,sentOtp,verifyUserOtp,signupWithGoogle,signinWithGoogle,cloudinaryService,uploadPost,
 //     getPost,likePost,unlikePost, getComments,sentComment,userRepository,userGraphService,postRepository,updateUserProfile,targetedProfile,getUserByUserId,updatePost,
 //     deletePost

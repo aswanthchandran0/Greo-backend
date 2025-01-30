@@ -65,6 +65,7 @@ import { DeleteNotification } from "../../domain/useCases/deleteNotification";
 import { GetUserNotification } from "../../domain/useCases/getUserNotification";
 import { NotificationUpdate } from "../../domain/useCases/notificationUpdate";
 import { DeleteRoll } from "../../domain/useCases/deleteRoll";
+import { GetUserProfiles } from "../../domain/useCases/getUserProfiles";
 // import { User, UserProfile } from "../../domain/entities/user";
 // import { GetUserProfile } from "../../domain/useCases/getUserProfile";
 // import { SendOtp } from "../../domain/useCases/sentOtp";
@@ -122,7 +123,8 @@ export class UserService {
     private deleteNotification:DeleteNotification,
     private getUserNotification:GetUserNotification,
     private notificationUpdate:NotificationUpdate,
-    private delteRoll:DeleteRoll
+    private delteRoll:DeleteRoll,
+    private getUserProfiles:GetUserProfiles
     //         private getUserProfile:GetUserProfile,
   ) //  private postRepository:PostRepository,
   //         private sentOtp:SendOtp,
@@ -412,6 +414,11 @@ export class UserService {
   async DeleteRoll(rollId:Types.ObjectId){
     return await this.delteRoll.execute(rollId)
   }
+
+  async GetUserProfiles(userId:mongoose.Types.ObjectId,page: number, limit: number = 8){
+        return await this.getUserProfiles.execute(userId,page,limit)
+  }
+  
   //    async getProfile(user_id:mongoose.Types.ObjectId):Promise<UserProfile |null>{
   //        return this.getUserProfile.execute(user_id)
   //    }

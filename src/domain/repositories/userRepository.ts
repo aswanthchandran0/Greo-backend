@@ -1,7 +1,7 @@
 import mongoose, { ClientSession } from "mongoose";
 import { User } from "../entities/user";
 import { PreProcessedFileInfo } from "typescript";
-import { IFollowers } from "../../application/dto/userDto";
+import { IFollowers, TopFollowerUserDto } from "../../application/dto/userDto";
 import { Iuser } from "../../infrastructure/database/mongo/models/userModel";
 
 export interface userRepository{
@@ -15,5 +15,5 @@ export interface userRepository{
     getArrayOfUsers(userIds:IFollowers[]):Promise<User[] | null>
     searchUsers(query: string): Promise<Iuser[]>;
     findStackOfUser(userIds:mongoose.Types.ObjectId[]):Promise<Iuser[] | null>
-    
+     getUsersWithPagination(userId:mongoose.Types.ObjectId,page: number, limit: number): Promise<{ users: TopFollowerUserDto[], totalUsers: number }>;
 }             
